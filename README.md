@@ -1,4 +1,4 @@
-# 🚀 Prompt Engineering dla Claude 4
+# 🚀 Prompt Engineering Claude 4 w Snowflake AI_COMPLETE
 
 **Zaawansowane techniki w Snowflake AI_COMPLETE**
 
