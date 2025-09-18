@@ -1,7 +1,7 @@
 -- Walidacja formatu danych z AI_COMPLETE
 -- Technika: Funkcja z zaawansowaną walidacją i normalizacją
 
-USE DATABASE SNOWFLAKE_SAMPLE_DATA;
+USE DATABASE STREAMLIT_DB;
 USE SCHEMA PUBLIC;
 
 CREATE OR REPLACE FUNCTION VALIDATE_AND_PROCESS(input_data VARIANT)
