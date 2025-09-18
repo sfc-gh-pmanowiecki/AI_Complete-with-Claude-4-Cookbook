@@ -1,6 +1,9 @@
 -- Walidacja formatu danych z AI_COMPLETE
 -- Technika: Funkcja z zaawansowaną walidacją i normalizacją
 
+USE DATABASE SNOWFLAKE_SAMPLE_DATA;
+USE SCHEMA PUBLIC;
+
 CREATE OR REPLACE FUNCTION VALIDATE_AND_PROCESS(input_data VARIANT)
 RETURNS VARIANT
 LANGUAGE SQL
@@ -24,21 +27,17 @@ Zwaliduj dane: ' || input_data::STRING,
                     'type': 'object',
                     'properties': {
                         'jest_poprawny': {'type': 'boolean'},
-                        'poziom_pewnosci': {
-                            'type': 'integer',
-                            'minimum': 1,
-                            'maximum': 10
-                        },
+                        'poziom_pewnosci': {'type': 'integer'},
                         'czas_walidacji': {'type': 'string'}
                     }
                 },
-                'błędy': {
+                'bledy': {
                     'type': 'array',
                     'items': {
                         'type': 'object',
                         'properties': {
                             'pole': {'type': 'string'},
-                            'rodzaj_błędu': {
+                            'rodzaj_bledu': {
                                 'type': 'string',
                                 'enum': ['format', 'zakres', 'wymagane', 'typ', 'logika']
                             },
@@ -47,13 +46,12 @@ Zwaliduj dane: ' || input_data::STRING,
                         }
                     }
                 },
-                'ostrzeżenia': {
+                'ostrzezenia': {
                     'type': 'array',
                     'items': {'type': 'string'}
                 },
                 'dane_po_czyszczeniu': {
-                    'type': 'object',
-                    'description': 'Dane po normalizacji i poprawkach'
+                    'type': 'object'
                 },
                 'statystyki': {
                     'type': 'object',
@@ -64,7 +62,7 @@ Zwaliduj dane: ' || input_data::STRING,
                     }
                 }
             },
-            'required': ['status_walidacji', 'błędy', 'ostrzeżenia', 'dane_po_czyszczeniu', 'statystyki'],
+            'required': ['status_walidacji', 'bledy', 'ostrzezenia', 'dane_po_czyszczeniu', 'statystyki'],
             'additionalProperties': false
         }
     }
