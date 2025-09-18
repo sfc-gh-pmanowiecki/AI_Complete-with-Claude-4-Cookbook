@@ -19,6 +19,7 @@ Licencja: MIT License
 - [5️⃣ Technika: Role-playing (Odgrywanie ról)](#5️⃣-technika-role-playing-odgrywanie-ról)
 - [6️⃣ Technika: Kontrola formatu wyjścia](#6️⃣-technika-kontrola-formatu-wyjścia)
 - [7️⃣ Technika: Walidacja i bezpieczeństwo](#7️⃣-technika-walidacja-i-bezpieczeństwo)
+- [8️⃣ Technika: Meta-prompting - Asystent inżynierii promptów](#8️⃣-technika-meta-prompting---asystent-inżynierii-promptów)
 - [✨ Najlepsze praktyki](#-najlepsze-praktyki)
 - [🎓 Podsumowanie](#-podsumowanie)
 - [🏷️ Aktualne nazwy modeli AI_COMPLETE](#️-aktualne-nazwy-modeli-ai_complete)
@@ -716,6 +717,149 @@ SELECT AI_COMPLETE(
 FROM user_input;
 ```
 
+---
+
+## 8️⃣ Technika: Meta-prompting - Asystent inżynierii promptów
+
+**Zasada:** Użyj AI do generowania optymalnych promptów dla innych zadań AI. Meta-prompting pozwala na automatyczne tworzenie dobrze zaprojektowanych promptów na podstawie opisu zadania lub celu biznesowego.
+
+### Przykład: Asystent tworzenia promptów
+
+```sql
+-- Meta-prompting: AI generuje prompty dla innych AI
+SELECT AI_COMPLETE(
+    model => 'claude-4-sonnet',
+    prompt => 'You are an expert AI prompt engineer. Your job is to help craft an optimized prompt for another AI assistant (like Claude) based on the user''s goal or task description. When the user provides a task description or goal, you will **generate a clear, structured prompt template** that the user can plug into an AI to achieve that goal. 
+
+**Requirements for the generated prompt:**
+
+- **Role Definition:** Begin by assigning the AI a relevant role or persona for the task (e.g. *"You are an experienced financial analyst..."*). This sets context.
+- **Task Instructions:** Clearly explain the task and steps the AI should follow. Provide detailed instructions or step-by-step guidance if appropriate.
+- **Chain-of-Thought/Scratchpad:** If complex reasoning is needed, include a scratchpad or reasoning section (e.g. in `<scratchpad>` tags) where the AI can brainstorm or work out the solution internally. *Example:* `In a <scratchpad>, list potential approaches...` 
+- **Input Variables:** Use placeholders in double curly braces for any dynamic inputs the user will provide. Enclose larger inputs or important variables in descriptive XML-like tags to make the structure clear. *For example:*  
+  `<customer_query>{{CUSTOMER_QUERY}}</customer_query>`  
+  `The query language is {{LANGUAGE}}.` 
+- **Output Format:** Specify the desired format of the AI''s output (e.g. `<analysis>...</analysis>` tags, bullet points, JSON, etc.) and any style guidelines.
+- **Examples (if helpful):** Optionally include a brief example or format illustration (e.g. example input-output pairs or a template structure) to clarify expectations. Ensure any examples are clearly separated (for instance, in `<example>` tags).
+- **Clarity and Conciseness:** The prompt itself should be well-organized and easy to follow, using tags or sections (like `<role>`, `<instructions>`, `<output_format>` etc.) for legibility. Avoid unnecessary words – be clear and direct.
+
+Finally, output **only the prompt template** (formatted as described) and nothing else. Do not add explanations or additional commentary outside the prompt.
+
+---
+
+Please create an optimized prompt for: "I need help analyzing customer feedback and providing actionable business insights"',
+    model_parameters => {
+        'temperature': 0.3,
+        'max_tokens': 2000
+    }
+) AS generated_prompt;
+```
+
+### Przykład: Generowanie promptu dla analizy finansowej
+
+```sql
+-- Meta-prompting dla specjalistycznych zadań biznesowych
+SELECT AI_COMPLETE(
+    model => 'claude-4-sonnet',
+    prompt => 'You are an expert AI prompt engineer specializing in business and financial analysis prompts. Create an optimized prompt template for: "I need an AI assistant that can analyze financial data and provide investment recommendations with risk assessment"',
+    model_parameters => {
+        'temperature': 0.2,
+        'max_tokens': 2500
+    },
+    response_format => {
+        'type': 'json',
+        'schema': {
+            'type': 'object',
+            'properties': {
+                'generated_prompt': {
+                    'type': 'string',
+                    'description': 'Kompletny prompt gotowy do użycia'
+                },
+                'key_techniques_used': {
+                    'type': 'array',
+                    'items': {'type': 'string'},
+                    'description': 'Lista zastosowanych technik prompt engineering'
+                },
+                'suggested_parameters': {
+                    'type': 'object',
+                    'properties': {
+                        'temperature': {'type': 'number'},
+                        'max_tokens': {'type': 'integer'},
+                        'model': {'type': 'string'}
+                    },
+                    'description': 'Rekomendowane parametry modelu'
+                },
+                'use_cases': {
+                    'type': 'array',
+                    'items': {'type': 'string'},
+                    'description': 'Przykładowe przypadki użycia'
+                },
+                'improvement_tips': {
+                    'type': 'array',
+                    'items': {'type': 'string'},
+                    'description': 'Wskazówki do dalszej optymalizacji'
+                }
+            },
+            'required': ['generated_prompt', 'key_techniques_used', 'suggested_parameters', 'use_cases', 'improvement_tips'],
+            'additionalProperties': false
+        }
+    }
+) AS investment_prompt_engineer;
+```
+
+### Przykład: Pipeline meta-promptingu
+
+```sql
+-- Dwuetapowy proces: generowanie promptu, a następnie jego użycie
+WITH generated_prompt AS (
+    SELECT AI_COMPLETE(
+        model => 'claude-4-sonnet',
+        prompt => 'Create an optimized prompt for analyzing e-commerce product reviews and extracting key insights for product managers.',
+        model_parameters => {
+            'temperature': 0.3,
+            'max_tokens': 1500
+        }
+    ) AS prompt_template
+),
+actual_analysis AS (
+    SELECT AI_COMPLETE(
+        model => 'claude-4-sonnet',
+        prompt => prompt_template || ' 
+
+Product reviews to analyze:
+- "Great product but shipping was slow - 4/5 stars"
+- "Amazing quality, exactly as described - 5/5 stars"  
+- "Product broke after 2 weeks, poor quality - 1/5 stars"
+- "Good value for money, would recommend - 4/5 stars"',
+        model_parameters => {
+            'temperature': 0.4,
+            'max_tokens': 1000
+        }
+    ) AS analysis_result
+    FROM generated_prompt
+)
+SELECT 
+    prompt_template,
+    analysis_result,
+    'Meta-prompting pipeline completed' AS status
+FROM generated_prompt, actual_analysis;
+```
+
+### Korzyści meta-promptingu
+
+- **🎯 Specjalizacja:** Generowane prompty są dostosowane do konkretnych zadań
+- **📏 Standardyzacja:** Spójne wzorce i najlepsze praktyki w promptach
+- **⚡ Szybkość:** Automatyczne tworzenie promptów zamiast ręcznego projektowania
+- **🔄 Iteracyjność:** Łatwa optymalizacja poprzez zmianę instrukcji meta-promptu
+- **📚 Wiedza:** Wykorzystanie najlepszych praktyk prompt engineering
+
+### Wskazówki dla meta-promptingu
+
+1. **Niskie temperature (0.2-0.3)** dla spójnych i precyzyjnych promptów
+2. **Jasny opis zadania** w instrukcji dla meta-promptu
+3. **Strukturyzowane odpowiedzi** z JSON schema dla łatwego parsowania
+4. **Testowanie wygenerowanych promptów** na rzeczywistych danych
+5. **Iteracyjne doskonalenie** meta-promptu na podstawie wyników
 
 ---
 
@@ -862,7 +1006,7 @@ Skuteczny prompt engineering w Snowflake Cortex z `response_format` wymaga:
 
 - ✅ **JSON Schema:** Dokładnie zdefiniowanych struktur odpowiedzi
 - ✅ **Walidacji wartości:** Wykorzystania `enum`, `pattern`, zakresów
-- ✅ **Technik promptowania:** Few-shot learning, CoT, role-playing
+- ✅ **Technik promptowania:** Few-shot learning, CoT, role-playing, meta-prompting
 - ✅ **Bezpieczeństwa:** Strukturizowana kontrola nad formatem odpowiedzi
 - ✅ **Pipeline'ów:** Łączenia etapów z gwarantowaną strukturą
 
@@ -1071,6 +1215,7 @@ graph LR
 │   ├── 09_generowanie_sql_naturalny_jezyk.sql
 │   ├── 10_generowanie_danych_testowych.sql
 │   ├── 11_bezpieczna_analiza_walidacja.sql
+│   ├── 12_prompt_engineering_assistant.sql
 │   ├── 13_pipeline_wieloetapowy.sql
 │   └── 14_sprawdzenie_dostepnych_modeli.sql
 └── snowflake-claude-prompt-engineering.html    # Wersja HTML
