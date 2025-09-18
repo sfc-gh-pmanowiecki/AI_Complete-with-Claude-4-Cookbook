@@ -933,6 +933,132 @@ SELECT AI_COMPLETE(
 
 ---
 
+## 🔍 AI Observability - Monitorowanie i ewaluacja modeli AI
+
+**Zintegruj monitoring i ewaluację swoich aplikacji AI z Snowflake AI Observability**
+
+### Dlaczego AI Observability?
+
+AI Observability w Snowflake Cortex umożliwia łatwe ewaluowanie i śledzenie aplikacji generatywnej AI. Dzięki tej funkcjonalności możesz:
+
+- **Mierzyć wydajność** aplikacji AI poprzez systematyczne ewaluacje
+- **Iterować nad konfiguracjami** aplikacji w celu optymalizacji wydajności  
+- **Logować ślady aplikacji** do debugowania
+- **Budować zaufanie i transparentność** aplikacji AI poprzez dokładne benchmarking
+
+### Kluczowe możliwości
+
+| Funkcjonalność | Opis | Zastosowanie |
+|----------------|------|--------------|
+| **TruLens Integration** | Biblioteka open-source do śledzenia aplikacji AI | Automatyczne instrumentowanie aplikacji |
+| **RAG Triad Metrics** | Context Relevance, Groundedness, Answer Relevance | Ocena jakości systemów RAG |
+| **LLM-as-Judge** | Ewaluacja używająca LLM do oceny odpowiedzi | Automatyczna ocena bez ground truth |
+| **Batch Evaluation** | Masowe uruchamianie ewaluacji na zestawach testowych | Systematyczne testowanie modeli |
+| **Snowsight Integration** | Wizualizacja wyników w interfejsie Snowflake | Łatwy dostęp do metryk i trace'ów |
+
+### Integracja z prompt engineering
+
+AI Observability doskonale uzupełnia techniki prompt engineering:
+
+```sql
+-- Przykład: Instrumentacja wywołania AI_COMPLETE z TruLens
+SELECT AI_COMPLETE(
+    model => 'claude-4-sonnet',
+    prompt => 'Twój starannie zaprojektowany prompt...',
+    model_parameters => {
+        'temperature': 0.3,
+        'max_tokens': 1000
+    }
+) AS response;
+
+-- Następnie możesz automatycznie ewaluować:
+-- - Jakość odpowiedzi (Answer Relevance)
+-- - Zgodność z promptem (Groundedness)  
+-- - Używanie kontekstu (Context Relevance)
+```
+
+### Główne metryki RAG Triad
+
+1. **Context Relevance** - Czy pobrany kontekst jest istotny dla zapytania użytkownika?
+2. **Groundedness** - Czy wygenerowana odpowiedź jest oparta na pobranym kontekście?
+3. **Answer Relevance** - Czy wygenerowana odpowiedź jest istotna dla zapytania użytkownika?
+
+### Przykład zastosowania
+
+```python
+# Instrumentacja aplikacji RAG z TruLens
+from trulens.core.otel.instrument import instrument
+from trulens.otel.semconv.trace import SpanAttributes
+
+class InstrumentedRAG:
+    @instrument(
+        span_type=SpanAttributes.SpanType.RETRIEVAL,
+        attributes={
+            SpanAttributes.RETRIEVAL.QUERY_TEXT: "query",
+            SpanAttributes.RETRIEVAL.RETRIEVED_CONTEXTS: "return",
+        }
+    )
+    def retrieve_context(self, query: str) -> list:
+        # Twoja logika pobierania kontekstu
+        return context_results
+
+    @instrument(span_type=SpanAttributes.SpanType.GENERATION)
+    def generate_completion(self, query: str, context_str: list) -> str:
+        # Wywołanie AI_COMPLETE z instrumentacją
+        return ai_complete_response
+```
+
+### Korzyści dla zespołów
+
+- **Data Scientists:** Systematyczna ewaluacja i optymalizacja modeli
+- **Developers:** Debugowanie i monitoring aplikacji AI w production
+- **Business Users:** Przejrzyste metryki jakości odpowiedzi AI
+- **MLOps Teams:** Zintegrowane pipeline'y ewaluacji i deploymentu
+
+### 🚀 Rozpocznij z AI Observability
+
+Aby rozpocząć pracę z AI Observability w Snowflake:
+
+1. **Przeczytaj kompletny przewodnik:** [Getting Started with AI Observability](https://quickstarts.snowflake.com/guide/getting_started_with_ai_observability/index.html)
+
+2. **Zainstaluj wymagane pakiety:**
+   ```python
+   # W Snowflake Notebook
+   - snowflake-ml-python
+   - snowflake.core  
+   - trulens-core==1.5.2
+   - trulens-providers-cortex==1.5.2
+   - trulens-connectors-snowflake==1.5.2
+   ```
+
+3. **Skonfiguruj uprawnienia:**
+   - `SNOWFLAKE.CORTEX_USER` database role
+   - `SNOWFLAKE.AI_OBSERVABILITY_EVENTS_LOOKUP` application role
+   - `CREATE EXTERNAL AGENT` privilege
+
+4. **Zbuduj pierwszy RAG z instrumentacją** - pełny przykład w quickstart guide
+
+5. **Uruchom ewaluacje** i przeanalizuj wyniki w Snowsight → AI & ML → Evaluations
+
+> 💡 **Połączenie mocy:** Użyj zaawansowanych technik prompt engineering z tego tutoriala + AI Observability = Skalowalne, niezawodne aplikacje AI z pełnym monitoringiem jakości.
+
+### Przykładowy workflow
+
+```mermaid
+graph LR
+    A[Prompt Engineering] --> B[AI_COMPLETE Call]
+    B --> C[TruLens Instrumentation] 
+    C --> D[Response Generation]
+    D --> E[Automatic Evaluation]
+    E --> F[Metrics in Snowsight]
+    F --> G[Optimize Prompts]
+    G --> A
+```
+
+**Więcej informacji:** [Snowflake AI Observability Quickstart Guide](https://quickstarts.snowflake.com/guide/getting_started_with_ai_observability/index.html)
+
+---
+
 ## 📁 Struktura projektu
 
 ```
