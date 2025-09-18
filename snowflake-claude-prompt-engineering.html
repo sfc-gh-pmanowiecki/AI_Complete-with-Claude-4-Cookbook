@@ -1363,6 +1363,159 @@ rekomendacje <span class="keyword">AS</span> (
 ) <span class="keyword">AS</span> model_test;</code></pre>
             </div>
         </section>
+
+        <section id="ai-observability" class="content-section">
+            <h2>🔍 AI Observability - Monitorowanie i ewaluacja modeli AI</h2>
+            <p><strong>Zintegruj monitoring i ewaluację swoich aplikacji AI z Snowflake AI Observability</strong></p>
+            
+            <h3>Dlaczego AI Observability?</h3>
+            <p>AI Observability w Snowflake Cortex umożliwia łatwe ewaluowanie i śledzenie aplikacji generatywnej AI. Dzięki tej funkcjonalności możesz:</p>
+            
+            <ul>
+                <li><strong>Mierzyć wydajność</strong> aplikacji AI poprzez systematyczne ewaluacje</li>
+                <li><strong>Iterować nad konfiguracjami</strong> aplikacji w celu optymalizacji wydajności</li>
+                <li><strong>Logować ślady aplikacji</strong> do debugowania</li>
+                <li><strong>Budować zaufanie i transparentność</strong> aplikacji AI poprzez dokładne benchmarking</li>
+            </ul>
+
+            <h3>Kluczowe możliwości</h3>
+            <table class="parameter-table">
+                <tr>
+                    <th>Funkcjonalność</th>
+                    <th>Opis</th>
+                    <th>Zastosowanie</th>
+                </tr>
+                <tr>
+                    <td><strong>TruLens Integration</strong></td>
+                    <td>Biblioteka open-source do śledzenia aplikacji AI</td>
+                    <td>Automatyczne instrumentowanie aplikacji</td>
+                </tr>
+                <tr>
+                    <td><strong>RAG Triad Metrics</strong></td>
+                    <td>Context Relevance, Groundedness, Answer Relevance</td>
+                    <td>Ocena jakości systemów RAG</td>
+                </tr>
+                <tr>
+                    <td><strong>LLM-as-Judge</strong></td>
+                    <td>Ewaluacja używająca LLM do oceny odpowiedzi</td>
+                    <td>Automatyczna ocena bez ground truth</td>
+                </tr>
+                <tr>
+                    <td><strong>Batch Evaluation</strong></td>
+                    <td>Masowe uruchamianie ewaluacji na zestawach testowych</td>
+                    <td>Systematyczne testowanie modeli</td>
+                </tr>
+                <tr>
+                    <td><strong>Snowsight Integration</strong></td>
+                    <td>Wizualizacja wyników w interfejsie Snowflake</td>
+                    <td>Łatwy dostęp do metryk i trace'ów</td>
+                </tr>
+            </table>
+
+            <h3>Integracja z prompt engineering</h3>
+            <p>AI Observability doskonale uzupełnia techniki prompt engineering:</p>
+            
+            <div class="code-container">
+                <button class="copy-button" onclick="copyCode(this)">Kopiuj</button>
+                <pre><code><span class="comment">-- Przykład: Instrumentacja wywołania AI_COMPLETE z TruLens</span>
+<span class="keyword">SELECT</span> AI_<span class="function">COMPLETE</span>(
+    model => <span class="string">'claude-4-sonnet'</span>,
+    prompt => <span class="string">'Twój starannie zaprojektowany prompt...'</span>,
+    model_parameters => {
+        <span class="string">'temperature'</span>: <span class="number">0.3</span>,
+        <span class="string">'max_tokens'</span>: <span class="number">1000</span>
+    }
+) <span class="keyword">AS</span> response;
+
+<span class="comment">-- Następnie możesz automatycznie ewaluować:</span>
+<span class="comment">-- - Jakość odpowiedzi (Answer Relevance)</span>
+<span class="comment">-- - Zgodność z promptem (Groundedness)</span>  
+<span class="comment">-- - Używanie kontekstu (Context Relevance)</span></code></pre>
+            </div>
+
+            <h3>Główne metryki RAG Triad</h3>
+            <ol>
+                <li><strong>Context Relevance</strong> - Czy pobrany kontekst jest istotny dla zapytania użytkownika?</li>
+                <li><strong>Groundedness</strong> - Czy wygenerowana odpowiedź jest oparta na pobranym kontekście?</li>
+                <li><strong>Answer Relevance</strong> - Czy wygenerowana odpowiedź jest istotna dla zapytania użytkownika?</li>
+            </ol>
+
+            <h3>Przykład zastosowania</h3>
+            <div class="code-container">
+                <button class="copy-button" onclick="copyCode(this)">Kopiuj</button>
+                <pre><code><span class="comment"># Instrumentacja aplikacji RAG z TruLens</span>
+<span class="keyword">from</span> trulens.core.otel.instrument <span class="keyword">import</span> instrument
+<span class="keyword">from</span> trulens.otel.semconv.trace <span class="keyword">import</span> SpanAttributes
+
+<span class="keyword">class</span> <span class="function">InstrumentedRAG</span>:
+    <span class="string">@instrument(
+        span_type=SpanAttributes.SpanType.RETRIEVAL,
+        attributes={
+            SpanAttributes.RETRIEVAL.QUERY_TEXT: "query",
+            SpanAttributes.RETRIEVAL.RETRIEVED_CONTEXTS: "return",
+        }
+    )</span>
+    <span class="keyword">def</span> <span class="function">retrieve_context</span>(<span class="keyword">self</span>, query: <span class="keyword">str</span>) -> <span class="keyword">list</span>:
+        <span class="comment"># Twoja logika pobierania kontekstu</span>
+        <span class="keyword">return</span> context_results
+
+    <span class="string">@instrument(span_type=SpanAttributes.SpanType.GENERATION)</span>
+    <span class="keyword">def</span> <span class="function">generate_completion</span>(<span class="keyword">self</span>, query: <span class="keyword">str</span>, context_str: <span class="keyword">list</span>) -> <span class="keyword">str</span>:
+        <span class="comment"># Wywołanie AI_COMPLETE z instrumentacją</span>
+        <span class="keyword">return</span> ai_complete_response</code></pre>
+            </div>
+
+            <h3>Korzyści dla zespołów</h3>
+            <ul>
+                <li><strong>Data Scientists:</strong> Systematyczna ewaluacja i optymalizacja modeli</li>
+                <li><strong>Developers:</strong> Debugowanie i monitoring aplikacji AI w production</li>
+                <li><strong>Business Users:</strong> Przejrzyste metryki jakości odpowiedzi AI</li>
+                <li><strong>MLOps Teams:</strong> Zintegrowane pipeline'y ewaluacji i deploymentu</li>
+            </ul>
+
+            <div class="technique-box">
+                <h3>🚀 Rozpocznij z AI Observability</h3>
+                <p>Aby rozpocząć pracę z AI Observability w Snowflake:</p>
+                
+                <ol>
+                    <li><strong>Przeczytaj kompletny przewodnik:</strong> <a href="https://quickstarts.snowflake.com/guide/getting_started_with_ai_observability/index.html" target="_blank">Getting Started with AI Observability</a></li>
+                    
+                    <li><strong>Zainstaluj wymagane pakiety:</strong>
+                        <pre style="background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 4px; font-size: 12px;"># W Snowflake Notebook
+- snowflake-ml-python
+- snowflake.core  
+- trulens-core==1.5.2
+- trulens-providers-cortex==1.5.2
+- trulens-connectors-snowflake==1.5.2</pre>
+                    </li>
+                    
+                    <li><strong>Skonfiguruj uprawnienia:</strong>
+                        <ul>
+                            <li><code>SNOWFLAKE.CORTEX_USER</code> database role</li>
+                            <li><code>SNOWFLAKE.AI_OBSERVABILITY_EVENTS_LOOKUP</code> application role</li>
+                            <li><code>CREATE EXTERNAL AGENT</code> privilege</li>
+                        </ul>
+                    </li>
+                    
+                    <li><strong>Zbuduj pierwszy RAG z instrumentacją</strong> - pełny przykład w quickstart guide</li>
+                    
+                    <li><strong>Uruchom ewaluacje</strong> i przeanalizuj wyniki w Snowsight → AI & ML → Evaluations</li>
+                </ol>
+            </div>
+
+            <div class="tip">
+                <strong>💡 Połączenie mocy:</strong> Użyj zaawansowanych technik prompt engineering z tego tutoriala + AI Observability = Skalowalne, niezawodne aplikacje AI z pełnym monitoringiem jakości.
+            </div>
+
+            <h3>Przykładowy workflow</h3>
+            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px; margin: 20px 0;">
+                <p><strong>Prompt Engineering</strong> → <strong>AI_COMPLETE Call</strong> → <strong>TruLens Instrumentation</strong> → <strong>Response Generation</strong> → <strong>Automatic Evaluation</strong> → <strong>Metrics in Snowsight</strong> → <strong>Optimize Prompts</strong> → <em>(powrót do początku)</em></p>
+            </div>
+
+            <div class="tip">
+                <strong>Więcej informacji:</strong> <a href="https://quickstarts.snowflake.com/guide/getting_started_with_ai_observability/index.html" target="_blank">Snowflake AI Observability Quickstart Guide</a>
+            </div>
+        </section>
             
             </div> <!-- Koniec content-wrapper -->
             
@@ -1381,6 +1534,7 @@ rekomendacje <span class="keyword">AS</span> (
                         <li><a href="#technika7">7️⃣ Walidacja i bezpieczeństwo</a></li>
                         <li><a href="#najlepsze-praktyki">✨ Najlepsze praktyki</a></li>
                         <li><a href="#nazwy-modeli">🏷️ Nazwy modeli Cortex</a></li>
+                        <li><a href="#ai-observability">🔍 AI Observability</a></li>
                     </ul>
                 </nav>
             </div> <!-- Koniec sidebar -->
