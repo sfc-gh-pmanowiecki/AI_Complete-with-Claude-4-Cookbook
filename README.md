@@ -1233,6 +1233,13 @@ graph LR
 
 ---
 
+## 📚 Bibliografia i referencje
+
+### Dokumentacja Anthropic Claude
+- [Prompt Engineering Overview](https://docs.claude.com/en/docs/build-with-claude/prompt-engineering/overview) - Kompleksowy przewodnik po technikach prompt engineering dla modeli Claude
+
+---
+
 ## 📧 Kontakt
 
 **Autor:** Paweł Manowiecki  
