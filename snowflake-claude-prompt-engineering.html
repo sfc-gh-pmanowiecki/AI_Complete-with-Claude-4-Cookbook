@@ -426,29 +426,6 @@
 ) <span class="keyword">AS</span> analiza_sentymentu;</code></pre>
             </div>
 
-            <h3>Drugie zapytanie: Przetwarzanie wyników z RESULT_SCAN</h3>
-            <div class="code-container">
-                <button class="copy-button" onclick="copyCode(this)">Kopiuj</button>
-                <pre><code><span class="comment">-- Drugie zapytanie: Bezpośredni dostęp do strukturyzowanej odpowiedzi</span>
-<span class="keyword">SELECT</span> 
-    <span class="comment">-- Kompletna odpowiedź JSON jest już w odpowiednim formacie</span>
-    PARSE_JSON(<span class="function">$1</span>) <span class="keyword">AS</span> parsed_response,
-    
-    <span class="comment">-- Bezpośredni dostęp do kategorii sentymentu</span>
-    PARSE_JSON(<span class="function">$1</span>):sentiment_categories:product_quality::<span class="keyword">STRING</span> <span class="keyword">AS</span> jakość_produktu,
-    PARSE_JSON(<span class="function">$1</span>):sentiment_categories:delivery_speed::<span class="keyword">STRING</span> <span class="keyword">AS</span> szybkość_dostawy,
-    PARSE_JSON(<span class="function">$1</span>):sentiment_categories:price_value::<span class="keyword">STRING</span> <span class="keyword">AS</span> stosunek_ceny,
-    PARSE_JSON(<span class="function">$1</span>):sentiment_categories:overall::<span class="keyword">STRING</span> <span class="keyword">AS</span> ogólny_sentyment,
-    
-    <span class="comment">-- Analiza wyników</span>
-    <span class="keyword">CASE</span> 
-        <span class="keyword">WHEN</span> PARSE_JSON(<span class="function">$1</span>):sentiment_categories:overall::<span class="keyword">STRING</span> = <span class="string">'positive'</span> <span class="keyword">THEN</span> <span class="string">'Pozytywny'</span>
-        <span class="keyword">WHEN</span> PARSE_JSON(<span class="function">$1</span>):sentiment_categories:overall::<span class="keyword">STRING</span> = <span class="string">'negative'</span> <span class="keyword">THEN</span> <span class="string">'Negatywny'</span>
-        <span class="keyword">ELSE</span> <span class="string">'Neutralny'</span>
-    <span class="keyword">END AS</span> kategoria_sentymentu
-
-<span class="keyword">FROM TABLE</span>(RESULT_SCAN(LAST_QUERY_ID()));</code></pre>
-            </div>
 
             <div class="tip">
                 <strong>💡 Korzyści z response_format:</strong>
@@ -1116,7 +1093,6 @@ Dostępny schemat:
                     <li><strong>Z response_format:</strong> JSON jest automatycznie walidowany - nie ma potrzeby dodatkowej walidacji</li>
                     <li><strong>Unikaj nadmiernie złożonych schema:</strong> dziel na etapy lub upraszczaj strukturę</li>
                     <li>Testuj schema na różnych przykładach przed wdrożeniem</li>
-                    <li><strong>RESULT_SCAN:</strong> Pamiętaj że z response_format nie ma metadata (usage, model, created)</li>
                 </ul>
             </div>
 
@@ -1235,7 +1211,6 @@ rekomendacje <span class="keyword">AS</span> (
                 <li>✅ <strong>Walidacji wartości:</strong> Wykorzystania <code>enum</code>, <code>pattern</code>, zakresów</li>
                 <li>✅ <strong>Technik promptowania:</strong> Few-shot learning, CoT, role-playing</li>
                 <li>✅ <strong>Bezpieczeństwa:</strong> Strukturizowana kontrola nad formatem odpowiedzi</li>
-                <li>✅ <strong>RESULT_SCAN:</strong> Prostszego przetwarzania bez metadata</li>
                 <li>✅ <strong>Pipeline'ów:</strong> Łączenia etapów z gwarantowaną strukturą</li>
             </ul>
             

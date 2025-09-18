@@ -106,29 +106,6 @@ SELECT AI_COMPLETE(
 ) AS analiza_sentymentu;
 ```
 
-### Drugie zapytanie: Przetwarzanie wyników z RESULT_SCAN
-
-```sql
--- Drugie zapytanie: Bezpośredni dostęp do strukturyzowanej odpowiedzi
-SELECT 
-    -- Kompletna odpowiedź JSON jest już w odpowiednim formacie
-    PARSE_JSON($1) AS parsed_response,
-    
-    -- Bezpośredni dostęp do kategorii sentymentu
-    PARSE_JSON($1):sentiment_categories:product_quality::STRING AS jakość_produktu,
-    PARSE_JSON($1):sentiment_categories:delivery_speed::STRING AS szybkość_dostawy,
-    PARSE_JSON($1):sentiment_categories:price_value::STRING AS stosunek_ceny,
-    PARSE_JSON($1):sentiment_categories:overall::STRING AS ogólny_sentyment,
-    
-    -- Analiza wyników
-    CASE 
-        WHEN PARSE_JSON($1):sentiment_categories:overall::STRING = 'positive' THEN 'Pozytywny'
-        WHEN PARSE_JSON($1):sentiment_categories:overall::STRING = 'negative' THEN 'Negatywny'
-        ELSE 'Neutralny'
-    END AS kategoria_sentymentu
-
-FROM TABLE(RESULT_SCAN(LAST_QUERY_ID()));
-```
 
 > 💡 **Korzyści z response_format:**  
 > • **Gwarantowana struktura:** JSON Schema zapewnia spójny format odpowiedzi  
@@ -770,7 +747,6 @@ FROM user_input;
 - **Z response_format:** JSON jest automatycznie walidowany - nie ma potrzeby dodatkowej walidacji
 - **Unikaj nadmiernie złożonych schema:** dziel na etapy lub upraszczaj strukturę
 - Testuj schema na różnych przykładach przed wdrożeniem
-- **RESULT_SCAN:** Pamiętaj że z response_format nie ma metadata (usage, model, created)
 
 ### 🔄 Przykład: Pipeline z wieloma etapami i JSON Schema
 
@@ -888,7 +864,6 @@ Skuteczny prompt engineering w Snowflake Cortex z `response_format` wymaga:
 - ✅ **Walidacji wartości:** Wykorzystania `enum`, `pattern`, zakresów
 - ✅ **Technik promptowania:** Few-shot learning, CoT, role-playing
 - ✅ **Bezpieczeństwa:** Strukturizowana kontrola nad formatem odpowiedzi
-- ✅ **RESULT_SCAN:** Prostszego przetwarzania bez metadata
 - ✅ **Pipeline'ów:** Łączenia etapów z gwarantowaną strukturą
 
 > 🚀 **Kluczowe korzyści response_format:**  
