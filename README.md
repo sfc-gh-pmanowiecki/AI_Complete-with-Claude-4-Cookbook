@@ -8,6 +8,28 @@ Licencja: MIT License
 
 ---
 
+## 📋 Spis treści
+
+- [📘 Wprowadzenie](#-wprowadzenie)
+- [⚙️ Parametry funkcji AI_COMPLETE](#️-parametry-funkcji-ai_complete)
+- [1️⃣ Technika: Jasne i szczegółowe instrukcje](#1️⃣-technika-jasne-i-szczegółowe-instrukcje)
+- [2️⃣ Technika: Strukturyzacja odpowiedzi](#2️⃣-technika-strukturyzacja-odpowiedzi)
+- [3️⃣ Technika: Few-shot Learning](#3️⃣-technika-few-shot-learning)
+- [4️⃣ Technika: Chain of Thought (CoT)](#4️⃣-technika-chain-of-thought-cot)
+- [5️⃣ Technika: Role-playing (Odgrywanie ról)](#5️⃣-technika-role-playing-odgrywanie-ról)
+- [6️⃣ Technika: Kontrola formatu wyjścia](#6️⃣-technika-kontrola-formatu-wyjścia)
+- [7️⃣ Technika: Walidacja i bezpieczeństwo](#7️⃣-technika-walidacja-i-bezpieczeństwo)
+- [✨ Najlepsze praktyki](#-najlepsze-praktyki)
+- [🎓 Podsumowanie](#-podsumowanie)
+- [🏷️ Aktualne nazwy modeli AI_COMPLETE](#️-aktualne-nazwy-modeli-ai_complete)
+- [🔍 AI Observability - Monitorowanie i ewaluacja modeli AI](#-ai-observability---monitorowanie-i-ewaluacja-modeli-ai)
+- [📁 Struktura projektu](#-struktura-projektu)
+- [🚀 Jak zacząć](#-jak-zacząć)
+- [📧 Kontakt](#-kontakt)
+- [📄 Licencja](#-licencja)
+
+---
+
 ## 📘 Wprowadzenie
 
 Ten tutorial przedstawia zaawansowane techniki prompt engineering dla modeli Claude 4 (Sonnet i Opus) w środowisku Snowflake z funkcją AI_COMPLETE. Każdy przykład zawiera pełny kod SQL gotowy do skopiowania i przetestowania w Snowsight.
